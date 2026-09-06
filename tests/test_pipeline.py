@@ -28,6 +28,27 @@ def create_dummy_face_image() -> io.BytesIO:
     return buf
 
 
+def test_root_endpoint():
+    """Verify root landing endpoint returns 200 with links."""
+    client = TestClient(app)
+    # JSON request
+    response = client.get("/", headers={"accept": "application/json"})
+    assert response.status_code == 200
+    assert response.json()["status"] == "online"
+
+    # Browser HTML request
+    html_resp = client.get("/", headers={"accept": "text/html"})
+    assert html_resp.status_code == 200
+    assert "FaceChain" in html_resp.text
+
+
+def test_favicon_endpoint():
+    """Verify favicon does not return 404."""
+    client = TestClient(app)
+    response = client.get("/favicon.ico")
+    assert response.status_code == 204
+
+
 def test_health_endpoint():
     """Verify that the health check endpoint responds with 200 OK and expected keys."""
     client = TestClient(app)

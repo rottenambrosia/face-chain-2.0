@@ -57,10 +57,17 @@ class BlockchainClient:
                 )
 
             if settings.DEPLOYER_PRIVATE_KEY:
-                pk = settings.DEPLOYER_PRIVATE_KEY
+                pk = settings.DEPLOYER_PRIVATE_KEY.strip()
                 if not pk.startswith("0x"):
                     pk = "0x" + pk
-                self.account = self.w3.eth.account.from_key(pk)
+                hex_part = pk[2:]
+                if len(hex_part) == 64 and all(c in "0123456789abcdefABCDEF" for c in hex_part):
+                    try:
+                        self.account = self.w3.eth.account.from_key(pk)
+                    except Exception as err:
+                        logger.info("Could not load account from DEPLOYER_PRIVATE_KEY: %s", err)
+                else:
+                    logger.info("DEPLOYER_PRIVATE_KEY is a placeholder. Using simulated ledger.")
 
             self.is_connected = self.w3.is_connected()
             logger.info("Web3 initialized. Connected to RPC: %s", self.is_connected)
