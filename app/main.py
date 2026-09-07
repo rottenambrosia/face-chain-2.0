@@ -44,7 +44,10 @@ async def lifespan(app: FastAPI):
 
     # Load InsightFace model (or OpenCV fallback)
     face_detector = FaceDetector()
-    logger.info("Face detection engine ready")
+    if face_detector.app is not None:
+        logger.info("InsightFace model loaded successfully")
+    else:
+        logger.info("Face detection ready (OpenCV fallback — InsightFace unavailable)")
 
     # Blockchain client
     blockchain_client = BlockchainClient()

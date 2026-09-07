@@ -20,6 +20,7 @@ from app.services.face.detector import FaceDetector
 from app.services.search.base import SearchProvider
 from app.services.search.facecheck import FaceCheckProvider
 from app.services.search.mock import MockSearchProvider
+from app.services.search.serpapi_provider import SerpApiProvider
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +34,24 @@ class PipelineService:
 
     def _get_search_provider(self) -> SearchProvider:
         """Select configured search provider with intelligent fallback."""
-        if settings.SEARCH_PROVIDER == "facecheck" and settings.FACECHECK_API_TOKEN:
+        provider = settings.SEARCH_PROVIDER.lower()
+
+        if provider == "serpapi" and settings.SERPAPI_API_KEY:
+            logger.info("Using SerpApiProvider (Google Lens) for genuine reverse image search")
+            return SerpApiProvider()
+
+        if provider == "facecheck" and settings.FACECHECK_API_TOKEN:
+            logger.info("Using FaceCheckProvider for reverse face search")
             return FaceCheckProvider()
+
+        if provider in ("serpapi", "facecheck"):
+            logger.warning(
+                "Search provider '%s' selected but no API key configured. "
+                "Falling back to MockSearchProvider. Set SERPAPI_API_KEY in .env "
+                "for genuine search (free at https://serpapi.com).",
+                provider,
+            )
+
         return MockSearchProvider()
 
     async def run(self, image_path: str, auto_select: bool = True) -> Dict[str, Any]:

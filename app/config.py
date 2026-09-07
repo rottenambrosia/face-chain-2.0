@@ -23,7 +23,8 @@ class Settings(BaseSettings):
     MIN_FACE_CONFIDENCE: float = 0.5
 
     # ── Search ───────────────────────────────────────────────────────────
-    SEARCH_PROVIDER: str = "facecheck"  # "facecheck" | "mock"
+    SEARCH_PROVIDER: str = "serpapi"  # "serpapi" | "facecheck" | "mock"
+    SERPAPI_API_KEY: str = ""
     FACECHECK_API_TOKEN: str = ""
     FACECHECK_TESTING_MODE: bool = True
     AUTO_SELECT_THRESHOLD: int = 70

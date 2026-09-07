@@ -189,12 +189,49 @@ with tab1:
             with st.expander("🌐 Step 2: Social Media & Web Match Discovered", expanded=True):
                 if res["search"] and res["search"]["selected"]:
                     sel = res["search"]["selected"]
+                    provider_name = res["search"].get("provider", "unknown")
+                    is_live = provider_name != "mock"
+                    
+                    if is_live:
+                        st.markdown(
+                            "<span class='status-badge badge-success'>🔴 LIVE SEARCH</span> "
+                            f"<span style='opacity:0.7;font-size:0.85rem;'>via {provider_name}</span>",
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.markdown(
+                            "<span class='status-badge badge-warn'>⚠️ DEMO MODE</span> "
+                            "<span style='opacity:0.7;font-size:0.85rem;'>Mock data — set SERPAPI_API_KEY for real search</span>",
+                            unsafe_allow_html=True,
+                        )
+                    
                     st.markdown(f"**Found On:** [{sel['source_url']}]({sel['source_url']})")
                     s_col1, s_col2 = st.columns(2)
                     with s_col1:
                         st.metric("Match Score", f"{sel['score']}/100")
                     with s_col2:
                         st.metric("Candidates Evaluated", res["search"]["candidates_found"])
+                    
+                    # Show all candidates with details
+                    all_cands = res["search"].get("all_candidates", [])
+                    if all_cands and is_live:
+                        st.markdown("**All Discovered Matches:**")
+                        for c in all_cands[:5]:
+                            raw = c.get("raw_data", {})
+                            title = raw.get("title", "Untitled")
+                            platform = raw.get("platform", "Web")
+                            url = c.get("source_url", "")
+                            thumb = raw.get("thumbnail", "")
+                            
+                            cols = st.columns([1, 4]) if thumb else [st.container()]
+                            if thumb:
+                                with cols[0]:
+                                    st.image(thumb, width=80)
+                                with cols[1]:
+                                    st.markdown(f"**{title}** ({platform})")
+                                    st.caption(f"[{url}]({url}) — Score: {c.get('score', '?')}/100")
+                            else:
+                                st.markdown(f"- **{title}** ({platform}) — [{url}]({url}) — Score: {c.get('score', '?')}/100")
                 else:
                     st.warning("No high-confidence matches found on the web.")
 
