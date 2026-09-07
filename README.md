@@ -8,7 +8,7 @@ FaceChain 2.0 detects and encodes a face from an input scan, discovers matching 
 
 ## 🚀 Key Highlights & Architectural Pillars
 
-1. **Genuine Reverse Face Search**: Integrates with the FaceCheck.id API for live cross-web face discovery across social media (Twitter/X, LinkedIn, Instagram, etc.), with automatic fallback to high-fidelity mock data for offline demos.
+1. **Genuine Reverse Face Search**: Integrates with SerpApi's Google Lens engine for live cross-web face discovery across social media (Twitter/X, LinkedIn, Instagram, etc.), with automatic fallback to high-fidelity mock data for offline demos.
 2. **Zero Biometrics On-Chain (Privacy-by-Design)**: Facial embeddings (512-d vectors) and raw biometrics stay strictly off-chain on secure local servers. Only deterministic SHA-256 fingerprints of canonical evidence are committed to smart contracts.
 3. **Deterministic Canonical Hashing**: Generates RFC-compliant canonical JSON (sorted keys, compact delimiters) and SHA-256 digests ensuring identical bit-level reproducibility on any machine.
 4. **Instant Tamper Detection & Re-Verification**: Provides a one-click re-verification mechanism that queries Polygon Amoy and recomputes the local hash. Modifying even a single character in the local evidence immediately triggers a tamper alert.
@@ -33,7 +33,7 @@ User uploads Face Scan (JPEG / PNG)
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ [2] Web / Social Media Reverse Search                       │
-│  • FaceCheck.id REST API (Upload → Poll → Normalize)        │
+│  • SerpApi Google Lens API (Upload → Parse → Normalize)     │
 │  • Fallback: MockSearchProvider for offline demo safety     │
 │  • Returns candidate URLs, match confidence scores & thumbs │
 └──────────────────────────────┬──────────────────────────────┘
@@ -71,7 +71,7 @@ User uploads Face Scan (JPEG / PNG)
 |---|---|---|
 | **Backend API** | FastAPI + Uvicorn | Async Python, automatic OpenAPI docs, typed Pydantic models |
 | **Face Engine** | InsightFace (ArcFace) + OpenCV | SOTA facial landmark alignment and 512-d normalized embeddings |
-| **Search Engine** | FaceCheck.id API | Specialized facial reverse-image search returning direct post URLs |
+| **Search Engine** | SerpApi (Google Lens) | Specialized facial reverse-image search returning direct post URLs |
 | **Blockchain** | Solidity 0.8.24 + Polygon Amoy | 2-second block finality, EVM compatibility, public block explorer |
 | **Contract Tooling** | Hardhat | Compilation, testing, deployment scripts |
 | **Web3 Client** | Web3.py | On-chain contract interaction, transaction signing, PoA middleware |
@@ -105,10 +105,9 @@ Copy `.env.example` to `.env`:
 cp .env.example .env
 ```
 Key configuration parameters:
-- `SEARCH_PROVIDER`: Set to `"facecheck"` for live web search or `"mock"` for offline demos.
-- `FACECHECK_API_TOKEN`: Your FaceCheck.id API token.
-- `FACECHECK_TESTING_MODE`: `true` for testing/dev, `false` for live production searches.
-- `POLYGON_AMOY_RPC_URL`: Polygon Amoy RPC endpoint (default: `https://rpc-amoy.polygon.technology/`).
+- `SEARCH_PROVIDER`: Set to `"serpapi"` for live web search or `"mock"` for offline demos.
+- `SERPAPI_API_KEY`: Your SerpApi API key (get one for free at https://serpapi.com).
+- `POLYGON_AMOY_RPC_URL`: Polygon Amoy RPC endpoint (default: `https://polygon-amoy.drpc.org`).
 - `DEPLOYER_PRIVATE_KEY`: Wallet private key for Polygon Amoy gas fees.
 - `CONTRACT_ADDRESS`: Address of deployed `EvidenceRegistry` contract.
 
